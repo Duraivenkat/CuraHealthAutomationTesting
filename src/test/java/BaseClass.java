@@ -1,7 +1,10 @@
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
+
+import java.time.Duration;
 
 public class BaseClass {
 
@@ -10,18 +13,28 @@ public class BaseClass {
     @BeforeMethod
     public void setup() {
 
-        driver = new ChromeDriver();
+        ChromeOptions options = new ChromeOptions();
 
-        driver.manage().window().maximize();
+        // Opens browser maximized
+        options.addArguments("--start-maximized");
 
-        driver.get("https://katalon-demo-cura.herokuapp.com");
+        // Disable notifications
+        options.addArguments("--disable-notifications");
+
+        // Create driver
+        driver = new ChromeDriver(options);
+
+        // Wait
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
+
+        // Open website
+        driver.get("https://katalon-demo-cura.herokuapp.com/");
     }
 
     @AfterMethod
     public void tearDown() {
 
         if (driver != null) {
-
             driver.quit();
         }
     }

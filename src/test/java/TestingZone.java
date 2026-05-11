@@ -7,7 +7,7 @@ public class TestingZone extends BaseClass {
 
     @Test(priority = 1)
 
-    public void CorrectLogin_01() {
+    public void CorrectLogin_01() throws InterruptedException {
 
         LoginPage obj01 = new LoginPage(driver);
 
@@ -16,12 +16,12 @@ public class TestingZone extends BaseClass {
                 "ThisIsNotAPassword"
         );
 
+        Thread.sleep(2000);
+
         String currentUrl = driver.getCurrentUrl();
 
-        System.out.println(currentUrl);
-
         Assert.assertTrue(
-                currentUrl.contains("appointment")
+                currentUrl.contains("#appointment")
         );
     }
 
@@ -40,8 +40,6 @@ public class TestingZone extends BaseClass {
 
         String error = obj01.getErrorMessage();
 
-        System.out.println(error);
-
         Assert.assertTrue(
                 error.contains("Login failed")
         );
@@ -51,7 +49,7 @@ public class TestingZone extends BaseClass {
 
     @Test(priority = 3)
 
-    public void LogoutTest_01() {
+    public void LogoutTest_01() throws InterruptedException {
 
         LoginPage obj01 = new LoginPage(driver);
 
@@ -62,9 +60,9 @@ public class TestingZone extends BaseClass {
 
         obj01.logout();
 
-        String currentUrl = driver.getCurrentUrl();
+        Thread.sleep(2000);
 
-        System.out.println(currentUrl);
+        String currentUrl = driver.getCurrentUrl();
 
         Assert.assertEquals(
                 currentUrl,
@@ -72,7 +70,7 @@ public class TestingZone extends BaseClass {
         );
     }
 
-    // 4. Protected Page Access Without Login
+    // 4. Protected Page Without Login
 
     @Test(priority = 4)
 
@@ -82,11 +80,10 @@ public class TestingZone extends BaseClass {
                 "https://katalon-demo-cura.herokuapp.com/#appointment"
         );
 
-        String currentUrl = driver.getCurrentUrl();
+        String pageSource = driver.getPageSource();
 
-        System.out.println(currentUrl);
-
-        Assert.assertTrue(currentUrl.contains("https://katalon-demo-cura.herokuapp.com/#appointment")
+        Assert.assertTrue(
+                pageSource.contains("Login")
         );
     }
 
@@ -149,7 +146,7 @@ public class TestingZone extends BaseClass {
         );
     }
 
-    // 7. Past Date Validation
+    // 7. Past Date Booking
 
     @Test(priority = 7)
 
@@ -172,10 +169,86 @@ public class TestingZone extends BaseClass {
 
         String currentUrl = driver.getCurrentUrl();
 
-        System.out.println(currentUrl);
+        Assert.assertTrue(
+                currentUrl.contains("summary")
+        );
+    }
+
+    // 8. History Page Test
+
+    @Test(priority = 8)
+
+    public void AppointmentHistoryPageTest() {
+
+        LoginPage obj01 = new LoginPage(driver);
+
+        obj01.login(
+                "John Doe",
+                "ThisIsNotAPassword"
+        );
+
+        HistoryPage obj03 = new HistoryPage(driver);
+
+        obj03.openHistoryPage();
+
+        String currentUrl = driver.getCurrentUrl();
 
         Assert.assertTrue(
-                currentUrl.contains("appointment")
+                currentUrl.contains("history")
+        );
+    }
+
+    // 9. History Appointment Details
+
+    @Test(priority = 9)
+
+    public void AppointmentHistoryDetailsTest() {
+
+        LoginPage obj01 = new LoginPage(driver);
+
+        obj01.login(
+                "John Doe",
+                "ThisIsNotAPassword"
+        );
+
+        AppointmentPage obj02 = new AppointmentPage(driver);
+
+        obj02.bookWithoutCheckbox(
+                "Tokyo CURA Healthcare Center",
+                "30/05/2026",
+                "History Test"
+        );
+
+        HistoryPage obj03 = new HistoryPage(driver);
+
+        obj03.openHistoryPage();
+
+        Assert.assertEquals(
+                obj03.getFacilityHistory(),
+                "Tokyo CURA Healthcare Center"
+        );
+    }
+
+    // 10. History Page Load Test
+
+    @Test(priority = 10)
+
+    public void HistoryPageLoadTest() {
+
+        LoginPage obj01 = new LoginPage(driver);
+
+        obj01.login(
+                "John Doe",
+                "ThisIsNotAPassword"
+        );
+
+        HistoryPage obj03 = new HistoryPage(driver);
+
+        obj03.openHistoryPage();
+
+        Assert.assertEquals(
+                obj03.getHistoryPageText(),
+                "History"
         );
     }
 }

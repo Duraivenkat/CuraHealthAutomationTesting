@@ -88,11 +88,13 @@ public class LoginPage {
 
     // Logout
 
-    public void logout() {
+    public void logout() throws InterruptedException {
 
         wait.until(
                 ExpectedConditions.elementToBeClickable(menuToggle)
         ).click();
+
+        Thread.sleep(2000);
 
         wait.until(
                 ExpectedConditions.elementToBeClickable(logoutButton)
