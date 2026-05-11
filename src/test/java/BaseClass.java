@@ -11,13 +11,18 @@ public class BaseClass {
     public void setup() {
 
         driver = new ChromeDriver();
+
         driver.manage().window().maximize();
+
         driver.get("https://katalon-demo-cura.herokuapp.com");
     }
 
     @AfterMethod
     public void tearDown() {
 
-        driver.quit();
+        if (driver != null) {
+
+            driver.quit();
+        }
     }
 }
