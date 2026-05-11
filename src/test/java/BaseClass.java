@@ -14,28 +14,16 @@ public class BaseClass {
     public void setup() {
 
         ChromeOptions options = new ChromeOptions();
-
-        // Opens browser maximized
         options.addArguments("--start-maximized");
 
-        // Disable notifications
-        options.addArguments("--disable-notifications");
-
-        // Create driver
         driver = new ChromeDriver(options);
-
-        // Wait
         driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
 
-        // Open website
         driver.get("https://katalon-demo-cura.herokuapp.com/");
     }
 
     @AfterMethod
     public void tearDown() {
-
-        if (driver != null) {
-            driver.quit();
-        }
+        if (driver != null) driver.quit();
     }
 }

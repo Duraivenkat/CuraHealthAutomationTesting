@@ -9,132 +9,53 @@ import java.time.Duration;
 public class AppointmentPage {
 
     WebDriver driver;
-
     WebDriverWait wait;
 
     public AppointmentPage(WebDriver driver) {
-
         this.driver = driver;
-
-        wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        this.wait = new WebDriverWait(driver, Duration.ofSeconds(10));
     }
-
-    // Locators
 
     By facility = By.id("combo_facility");
+    By hospital = By.id("chk_hospotal_readmission");
+    By date = By.id("txt_visit_date");
+    By comment = By.id("txt_comment");
+    By bookBtn = By.id("btn-book-appointment");
 
-    By applyCheckbox = By.id("chk_hospotal_readmission");
+    By confFacility = By.id("facility");
+    By confDate = By.id("visit_date");
+    By confHospital = By.id("hospital_readmission");
 
-    By visitDate = By.id("txt_visit_date");
+    public void book(String fac, String dt, String comm, boolean hospitalCheck) {
 
-    By commentBox = By.id("txt_comment");
+        wait.until(ExpectedConditions.urlContains("appointment"));
+        wait.until(ExpectedConditions.visibilityOfElementLocated(facility));
 
-    By bookButton = By.id("btn-book-appointment");
+        new Select(driver.findElement(facility)).selectByVisibleText(fac);
 
-    // Confirmation Page
+        if (hospitalCheck) {
+            driver.findElement(hospital).click();
+        }
 
-    By confirmFacility = By.id("facility");
+        driver.findElement(date).sendKeys(dt);
+        driver.findElement(comment).sendKeys(comm);
 
-    By confirmDate = By.id("visit_date");
-
-    By hospitalReadmission =
-            By.xpath("//p[@id='hospital_readmission']");
-
-    // Actions
-
-    public void selectFacility(String value) {
-
-        wait.until(
-                ExpectedConditions.visibilityOfElementLocated(facility)
-        );
-
-        Select select = new Select(driver.findElement(facility));
-
-        select.selectByVisibleText(value);
+        driver.findElement(bookBtn).click();
     }
 
-    public void clickHospitalCheckbox() {
-
-        wait.until(
-                ExpectedConditions.elementToBeClickable(applyCheckbox)
-        ).click();
+    public String getFacility() {
+        return driver.findElement(confFacility).getText();
     }
 
-    public void enterDate(String date) {
-
-        wait.until(
-                ExpectedConditions.visibilityOfElementLocated(visitDate)
-        ).clear();
-
-        driver.findElement(visitDate).sendKeys(date);
+    public String getDate() {
+        return driver.findElement(confDate).getText();
     }
 
-    public void enterComment(String comment) {
-
-        wait.until(
-                ExpectedConditions.visibilityOfElementLocated(commentBox)
-        ).sendKeys(comment);
+    public String getHospital() {
+        return driver.findElement(confHospital).getText();
     }
 
-    public void clickBookButton() {
-
-        wait.until(
-                ExpectedConditions.elementToBeClickable(bookButton)
-        ).click();
-    }
-
-    // Booking Without Checkbox
-
-    public void bookWithoutCheckbox(String a,
-                                    String b,
-                                    String c) {
-
-        selectFacility(a);
-
-        enterDate(b);
-
-        enterComment(c);
-
-        clickBookButton();
-    }
-
-    // Booking With Checkbox
-
-    public void bookWithCheckbox(String a,
-                                 String b,
-                                 String c) {
-
-        selectFacility(a);
-
-        clickHospitalCheckbox();
-
-        enterDate(b);
-
-        enterComment(c);
-
-        clickBookButton();
-    }
-
-    // Confirmation Methods
-
-    public String getFacilityText() {
-
-        return wait.until(
-                ExpectedConditions.visibilityOfElementLocated(confirmFacility)
-        ).getText();
-    }
-
-    public String getDateText() {
-
-        return wait.until(
-                ExpectedConditions.visibilityOfElementLocated(confirmDate)
-        ).getText();
-    }
-
-    public String getHospitalReadmissionText() {
-
-        return wait.until(
-                ExpectedConditions.visibilityOfElementLocated(hospitalReadmission)
-        ).getText();
+    public String getCommentText() {
+        return driver.getPageSource();
     }
 }

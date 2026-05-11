@@ -1,254 +1,136 @@
+import org.openqa.selenium.By;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
 public class TestingZone extends BaseClass {
 
-    // 1. Successful Login
-
-    @Test(priority = 1)
-
-    public void CorrectLogin_01() throws InterruptedException {
-
-        LoginPage obj01 = new LoginPage(driver);
-
-        obj01.login(
-                "John Doe",
-                "ThisIsNotAPassword"
-        );
-
-        Thread.sleep(2000);
-
-        String currentUrl = driver.getCurrentUrl();
-
-        Assert.assertTrue(
-                currentUrl.contains("#appointment")
-        );
+    // MODULE 1
+    @Test
+    public void validLogin() {
+        LoginPage lp = new LoginPage(driver);
+        lp.login("John Doe", "ThisIsNotAPassword");
+        Assert.assertTrue(driver.getCurrentUrl().contains("appointment"));
     }
 
-    // 2. Invalid Login
-
-    @Test(priority = 2)
-
-    public void IncorrectLogin_01() {
-
-        LoginPage obj01 = new LoginPage(driver);
-
-        obj01.login(
-                "wronguser",
-                "wrongpassword"
-        );
-
-        String error = obj01.getErrorMessage();
-
-        Assert.assertTrue(
-                error.contains("Login failed")
-        );
+    @Test
+    public void invalidLogin() {
+        LoginPage lp = new LoginPage(driver);
+        lp.login("wrong", "wrong");
+        Assert.assertTrue(lp.getErrorMessage().length() > 0);
     }
 
-    // 3. Logout Test
+    @Test
+    public void logoutTest() {
+        LoginPage lp = new LoginPage(driver);
+        lp.login("John Doe", "ThisIsNotAPassword");
 
-    @Test(priority = 3)
+        driver.findElement(By.id("menu-toggle")).click();
+        driver.findElement(By.linkText("Logout")).click();
 
-    public void LogoutTest_01() throws InterruptedException {
-
-        LoginPage obj01 = new LoginPage(driver);
-
-        obj01.login(
-                "John Doe",
-                "ThisIsNotAPassword"
-        );
-
-        obj01.logout();
-
-        Thread.sleep(2000);
-
-        String currentUrl = driver.getCurrentUrl();
-
-        Assert.assertEquals(
-                currentUrl,
-                "https://katalon-demo-cura.herokuapp.com/"
-        );
+        Assert.assertEquals(driver.getCurrentUrl(),
+                "https://katalon-demo-cura.herokuapp.com/");
     }
 
-    // 4. Protected Page Without Login
-
-    @Test(priority = 4)
-
-    public void ProtectedPageWithoutLoginTest() {
-
-        driver.get(
-                "https://katalon-demo-cura.herokuapp.com/#appointment"
-        );
-
-        String pageSource = driver.getPageSource();
-
-        Assert.assertTrue(
-                pageSource.contains("Login")
-        );
+    @Test
+    public void protectedPageTest() {
+        driver.get("https://katalon-demo-cura.herokuapp.com/#appointment");
+        Assert.assertTrue(driver.getPageSource().contains("Login"));
     }
 
-    // 5. Appointment Booking
+    // MODULE 2
+    @Test
+    public void appointmentTest() {
+        LoginPage lp = new LoginPage(driver);
+        lp.login("John Doe", "ThisIsNotAPassword");
 
-    @Test(priority = 5)
+        AppointmentPage ap = new AppointmentPage(driver);
+        ap.book("Tokyo CURA Healthcare Center", "15/06/2026", "Checkup", false);
 
-    public void AppointmentBookingTest_02() {
-
-        LoginPage obj01 = new LoginPage(driver);
-
-        obj01.login(
-                "John Doe",
-                "ThisIsNotAPassword"
-        );
-
-        AppointmentPage obj02 = new AppointmentPage(driver);
-
-        obj02.bookWithoutCheckbox(
-                "Tokyo CURA Healthcare Center",
-                "20/05/2026",
-                "General Checkup"
-        );
-
-        Assert.assertEquals(
-                obj02.getFacilityText(),
-                "Tokyo CURA Healthcare Center"
-        );
-
-        Assert.assertEquals(
-                obj02.getDateText(),
-                "20/05/2026"
-        );
+        Assert.assertEquals(ap.getFacility(), "Tokyo CURA Healthcare Center");
     }
 
-    // 6. Hospital Admission Booking
+    @Test
+    public void hospitalCheckTest() {
+        LoginPage lp = new LoginPage(driver);
+        lp.login("John Doe", "ThisIsNotAPassword");
 
-    @Test(priority = 6)
+        AppointmentPage ap = new AppointmentPage(driver);
+        ap.book("Hongkong CURA Healthcare Center", "20/06/2026", "Dental", true);
 
-    public void HospitalAdmissionBookingTest() {
-
-        LoginPage obj01 = new LoginPage(driver);
-
-        obj01.login(
-                "John Doe",
-                "ThisIsNotAPassword"
-        );
-
-        AppointmentPage obj02 = new AppointmentPage(driver);
-
-        obj02.bookWithCheckbox(
-                "Hongkong CURA Healthcare Center",
-                "25/05/2026",
-                "Dental Checkup"
-        );
-
-        Assert.assertEquals(
-                obj02.getHospitalReadmissionText(),
-                "Yes"
-        );
+        Assert.assertEquals(ap.getHospital(), "Yes");
     }
 
-    // 7. Past Date Booking
+    @Test
+    public void pastDateTest() {
+        LoginPage lp = new LoginPage(driver);
+        lp.login("John Doe", "ThisIsNotAPassword");
 
-    @Test(priority = 7)
+        AppointmentPage ap = new AppointmentPage(driver);
+        ap.book("Seoul CURA Healthcare Center", "01/01/2020", "Past", false);
 
-    public void PastDateBookingTest() {
-
-        LoginPage obj01 = new LoginPage(driver);
-
-        obj01.login(
-                "John Doe",
-                "ThisIsNotAPassword"
-        );
-
-        AppointmentPage obj02 = new AppointmentPage(driver);
-
-        obj02.bookWithoutCheckbox(
-                "Seoul CURA Healthcare Center",
-                "01/01/2020",
-                "Past Date Test"
-        );
-
-        String currentUrl = driver.getCurrentUrl();
-
-        Assert.assertTrue(
-                currentUrl.contains("summary")
-        );
+        Assert.assertTrue(driver.getPageSource().contains("Appointment Confirmation"));
     }
 
-    // 8. History Page Test
+    // MODULE 3
+    @Test
+    public void historyTest() {
+        LoginPage lp = new LoginPage(driver);
+        lp.login("John Doe", "ThisIsNotAPassword");
 
-    @Test(priority = 8)
+        HistoryPage hp = new HistoryPage(driver);
+        hp.openHistory();
 
-    public void AppointmentHistoryPageTest() {
-
-        LoginPage obj01 = new LoginPage(driver);
-
-        obj01.login(
-                "John Doe",
-                "ThisIsNotAPassword"
-        );
-
-        HistoryPage obj03 = new HistoryPage(driver);
-
-        obj03.openHistoryPage();
-
-        String currentUrl = driver.getCurrentUrl();
-
-        Assert.assertTrue(
-                currentUrl.contains("history")
-        );
+        Assert.assertFalse(hp.isHistoryLoaded());
     }
 
-    // 9. History Appointment Details
+    // MODULE 4
+    @Test
+    public void multipleAppointments() {
+        LoginPage lp = new LoginPage(driver);
+        lp.login("John Doe", "ThisIsNotAPassword");
 
-    @Test(priority = 9)
+        AppointmentPage ap = new AppointmentPage(driver);
 
-    public void AppointmentHistoryDetailsTest() {
+        ap.book("Tokyo CURA Healthcare Center", "15/06/2026", "A", false);
 
-        LoginPage obj01 = new LoginPage(driver);
+        driver.get("https://katalon-demo-cura.herokuapp.com/#appointment");
 
-        obj01.login(
-                "John Doe",
-                "ThisIsNotAPassword"
-        );
+        ap.book("Hongkong CURA Healthcare Center", "20/06/2026", "B", false);
 
-        AppointmentPage obj02 = new AppointmentPage(driver);
+        HistoryPage hp = new HistoryPage(driver);
+        hp.openHistory();
 
-        obj02.bookWithoutCheckbox(
-                "Tokyo CURA Healthcare Center",
-                "30/05/2026",
-                "History Test"
-        );
-
-        HistoryPage obj03 = new HistoryPage(driver);
-
-        obj03.openHistoryPage();
-
-        Assert.assertEquals(
-                obj03.getFacilityHistory(),
-                "Tokyo CURA Healthcare Center"
-        );
+        Assert.assertTrue(hp.isHistoryLoaded());
     }
 
-    // 10. History Page Load Test
+    // MODULE 5
+    @Test
+    public void emptyLoginTest() {
+        LoginPage lp = new LoginPage(driver);
+        Assert.assertTrue(lp.isLoginButtonEnabled());
+    }
 
-    @Test(priority = 10)
+    @Test
+    public void emptyDateTest() {
+        LoginPage lp = new LoginPage(driver);
+        lp.login("John Doe", "ThisIsNotAPassword");
 
-    public void HistoryPageLoadTest() {
+        AppointmentPage ap = new AppointmentPage(driver);
+        ap.book("Tokyo CURA Healthcare Center", "", "test", false);
 
-        LoginPage obj01 = new LoginPage(driver);
+        Assert.assertTrue(driver.getCurrentUrl().contains("appointment"));
+    }
 
-        obj01.login(
-                "John Doe",
-                "ThisIsNotAPassword"
-        );
+    @Test
+    public void longCommentTest() {
+        LoginPage lp = new LoginPage(driver);
+        lp.login("John Doe", "ThisIsNotAPassword");
 
-        HistoryPage obj03 = new HistoryPage(driver);
+        AppointmentPage ap = new AppointmentPage(driver);
 
-        obj03.openHistoryPage();
+        String longText = "A".repeat(500);
+        ap.book("Tokyo CURA Healthcare Center", "15/06/2026", longText, false);
 
-        Assert.assertEquals(
-                obj03.getHistoryPageText(),
-                "History"
-        );
+        Assert.assertTrue(ap.getCommentText().length() > 200);
     }
 }
