@@ -17,14 +17,12 @@ public class AppointmentPage {
     }
 
     By facility = By.id("combo_facility");
-    By hospital = By.id("chk_hospotal_readmission");
+    By hospital = By.id("chk_hospital_readmission");
     By date = By.id("txt_visit_date");
     By comment = By.id("txt_comment");
     By bookBtn = By.id("btn-book-appointment");
 
-    By confFacility = By.id("facility");
-    By confDate = By.id("visit_date");
-    By confHospital = By.id("hospital_readmission");
+
 
     public void book(String fac, String dt, String comm, boolean hospitalCheck) {
 
@@ -34,6 +32,10 @@ public class AppointmentPage {
         new Select(driver.findElement(facility)).selectByVisibleText(fac);
 
         if (hospitalCheck) {
+
+            wait.until(
+                    ExpectedConditions.elementToBeClickable(hospital));
+
             driver.findElement(hospital).click();
         }
 
@@ -43,17 +45,7 @@ public class AppointmentPage {
         driver.findElement(bookBtn).click();
     }
 
-    public String getFacility() {
-        return driver.findElement(confFacility).getText();
-    }
 
-    public String getDate() {
-        return driver.findElement(confDate).getText();
-    }
-
-    public String getHospital() {
-        return driver.findElement(confHospital).getText();
-    }
 
     public String getCommentText() {
         return driver.getPageSource();

@@ -5,14 +5,14 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
 
-public class LoginPage {
+public class LoginPage extends BasePage {
 
     WebDriver driver;
-    WebDriverWait wait;
+
 
     public LoginPage(WebDriver driver) {
+        super(driver);
         this.driver = driver;
-        this.wait = new WebDriverWait(driver, Duration.ofSeconds(10));
     }
 
     By makeAppointment = By.id("btn-make-appointment");
@@ -20,30 +20,47 @@ public class LoginPage {
     By password = By.id("txt-password");
     By loginBtn = By.id("btn-login");
     By errorMsg = By.xpath("//p[contains(@class,'text-danger')]");
+    By menu = By.id("menu-toggle");
+    By logout = By.linkText("Logout");
 
     public void openLoginPage() {
-        wait.until(ExpectedConditions.elementToBeClickable(makeAppointment)).click();
+        waitForElement(makeAppointment);
+        driver.findElement(makeAppointment).click();
     }
 
     public void login(String user, String pass) {
 
         openLoginPage();
 
-        wait.until(ExpectedConditions.visibilityOfElementLocated(username)).sendKeys(user);
-        wait.until(ExpectedConditions.visibilityOfElementLocated(password)).sendKeys(pass);
+        waitForElement(username);
+        driver.findElement(username).sendKeys(user);
+        waitForElement(password);
+        driver.findElement(password).sendKeys(pass);
 
-        wait.until(ExpectedConditions.elementToBeClickable(loginBtn)).click();
+        driver.findElement(loginBtn).click();
+        wait.until(ExpectedConditions.urlContains("appointment"));
 
         // IMPORTANT FIX
-        wait.until(ExpectedConditions.urlContains("appointment"));
+
     }
 
     public String getErrorMessage() {
-        return wait.until(ExpectedConditions.visibilityOfElementLocated(errorMsg)).getText();
+        waitForElement(errorMsg);
+        return driver.findElement(errorMsg).getText();
     }
 
     public boolean isLoginButtonEnabled() {
         openLoginPage();
         return driver.findElement(loginBtn).isEnabled();
+    }
+    public void logout() {
+
+        wait.until(
+                        ExpectedConditions.elementToBeClickable(menu))
+                .click();
+
+        wait.until(
+                        ExpectedConditions.elementToBeClickable(logout))
+                .click();
     }
 }

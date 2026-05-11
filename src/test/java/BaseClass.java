@@ -3,6 +3,9 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
+import io.github.bonigarcia.wdm.WebDriverManager;
+import org.openqa.selenium.firefox.FirefoxDriver;
+import io.github.bonigarcia.wdm.WebDriverManager;
 
 import java.time.Duration;
 
@@ -13,13 +16,28 @@ public class BaseClass {
     @BeforeMethod
     public void setup() {
 
-        ChromeOptions options = new ChromeOptions();
-        options.addArguments("--start-maximized");
 
-        driver = new ChromeDriver(options);
-        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
+        ConfigReader cr = new ConfigReader();
 
-        driver.get("https://katalon-demo-cura.herokuapp.com/");
+        String browser = cr.getBrowser();
+
+        if (browser.equalsIgnoreCase("chrome")) {
+
+            ChromeOptions options = new ChromeOptions();
+            options.addArguments("--start-maximized");
+
+            WebDriverManager.chromedriver().setup();
+            driver = new ChromeDriver(options);
+
+        } else if (browser.equalsIgnoreCase("firefox")) {
+
+            WebDriverManager.firefoxdriver().setup();
+            driver = new FirefoxDriver();
+        }
+        driver.manage().timeouts()
+                .implicitlyWait(Duration.ofSeconds(cr.getTimeout()));
+
+        driver.get(cr.getBaseUrl());
     }
 
     @AfterMethod

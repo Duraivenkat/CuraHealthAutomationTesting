@@ -5,14 +5,14 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
 
-public class HistoryPage {
+public class HistoryPage extends BasePage  {
 
     WebDriver driver;
-    WebDriverWait wait;
+
 
     public HistoryPage(WebDriver driver) {
+        super(driver);
         this.driver = driver;
-        this.wait = new WebDriverWait(driver, Duration.ofSeconds(10));
     }
 
     By menu = By.id("menu-toggle");
@@ -20,8 +20,13 @@ public class HistoryPage {
     By table = By.cssSelector(".table");
 
     public void openHistory() {
-        wait.until(ExpectedConditions.elementToBeClickable(menu)).click();
-        wait.until(ExpectedConditions.elementToBeClickable(history)).click();
+
+        waitForElement(menu);
+        driver.findElement(menu).click();
+
+        wait.until(ExpectedConditions.elementToBeClickable(history));
+
+        driver.findElement(history).click();
     }
 
     public boolean isHistoryLoaded() {
